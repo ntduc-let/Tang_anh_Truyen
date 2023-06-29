@@ -157,6 +157,13 @@ fun AppCompatActivity.setupNavigationWithNavigationDrawer(
   return appBarConfiguration
 }
 
+fun Fragment.getNavigationResult(key: String = "result") =
+  findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(key)
+
+fun Fragment.setNavigationResult(result: String, key: String = "result") {
+  findNavController().previousBackStackEntry?.savedStateHandle?.set(key, result)
+}
+
 fun navigateToDes(
   navController: NavController,
   @IdRes idDes: Int,
@@ -256,6 +263,13 @@ fun Fragment.removeMotionStart() =
   this.apply {
     exitTransition = null
     reenterTransition = null
+  }
+
+fun Fragment.removeMotionEnd() =
+  this.apply {
+    enterTransition = null
+    returnTransition = null
+    sharedElementEnterTransition = null
   }
 
 fun Fragment.setMotionScaleStart() =

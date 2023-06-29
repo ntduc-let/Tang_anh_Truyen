@@ -3,7 +3,6 @@ package com.ntduc.baseproject.ui.base
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import androidx.activity.OnBackPressedCallback
 import androidx.annotation.LayoutRes
 import androidx.core.view.doOnPreDraw
 import androidx.databinding.ViewDataBinding
@@ -22,11 +21,8 @@ abstract class BaseFragment<T : ViewDataBinding> constructor(
     @LayoutRes val contentLayoutId: Int
 ) : BindingFragment<T>(contentLayoutId) {
 
-    private val onBackPressed = object : OnBackPressedCallback(false) {
-        override fun handleOnBackPressed() {
-            onBackPressed()
-        }
-    }
+//    var banner: BannerAds<*>? = null
+//    var native: NativeAds<*>? = null
 
     val currentNavigationFragment: Fragment?
         get() = parentFragmentManager.fragments.first()
@@ -53,8 +49,6 @@ abstract class BaseFragment<T : ViewDataBinding> constructor(
                 scrimColor = Color.TRANSPARENT
             }
         }
-
-        requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressed)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -93,5 +87,19 @@ abstract class BaseFragment<T : ViewDataBinding> constructor(
 
     open fun initData() {}
 
-    open fun onBackPressed() {}
+    override fun onResume() {
+        super.onResume()
+//        banner?.resumeAds()
+    }
+
+    override fun onPause() {
+//        banner?.pauseAds()
+        super.onPause()
+    }
+
+    override fun onDestroyView() {
+//        banner?.destroyAds()
+//        native?.destroyAds()
+        super.onDestroyView()
+    }
 }
