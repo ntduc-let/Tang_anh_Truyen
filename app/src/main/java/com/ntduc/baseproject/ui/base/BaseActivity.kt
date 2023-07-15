@@ -9,6 +9,9 @@ abstract class BaseActivity<T : ViewDataBinding> constructor(
     @LayoutRes val contentLayoutId: Int
 ) : BindingActivity<T>(contentLayoutId) {
 
+//    var banner: BannerAds<*>? = null
+//    var native: NativeAds<*>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -25,4 +28,20 @@ abstract class BaseActivity<T : ViewDataBinding> constructor(
     open fun addObservers() {}
 
     open fun initData() {}
+
+    override fun onResume() {
+        super.onResume()
+//        banner?.resumeAds()
+    }
+
+    override fun onPause() {
+//        banner?.pauseAds()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+//        banner?.destroyAds()
+//        native?.destroyAds()
+        super.onDestroy()
+    }
 }
