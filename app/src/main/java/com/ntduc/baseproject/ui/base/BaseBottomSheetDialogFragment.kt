@@ -1,6 +1,7 @@
 package com.ntduc.baseproject.ui.base
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
@@ -32,6 +33,13 @@ abstract class BaseBottomSheetDialogFragment<T : ViewDataBinding> constructor(
         }
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        onDismissListener?.let {
+            it()
+        }
+        super.onDismiss(dialog)
+    }
+
     override fun show(manager: FragmentManager, tag: String?) {
         if (isAdded) {
             return
@@ -61,4 +69,10 @@ abstract class BaseBottomSheetDialogFragment<T : ViewDataBinding> constructor(
     open fun addObservers() {}
 
     open fun initData() {}
+
+    private var onDismissListener: (() -> Unit)? = null
+
+    fun setOnDismissListener(listener: () -> Unit) {
+        onDismissListener = listener
+    }
 }

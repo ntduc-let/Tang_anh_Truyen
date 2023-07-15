@@ -37,22 +37,25 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- ADS -->
-        <!-- <meta-data -->
-        <!-- android:name="com.google.android.gms.ads.APPLICATION_ID" -->
-        <!-- android:value="@string/ads_app_id" /> -->
-        <!-- <meta-data -->
-        <!-- android:name="applovin.sdk.key" -->
-        <!-- android:value="@string/applovin_sdk_key" /> -->
-        <!-- <meta-data -->
-        <!-- android:name="com.google.android.gms.ads.AD_MANAGER_APP" -->
-        <!-- android:value="true"/> -->
-        <!-- <meta-data -->
-        <!-- android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION" -->
-        <!-- android:value="true"/> -->
-        <!-- <meta-data -->
-        <!-- android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING" -->
-        <!-- android:value="true"/> -->
+        </activity>
+
+        <!-- ADS -->
+<!--        <meta-data-->
+<!--            android:name="com.google.android.gms.ads.APPLICATION_ID"-->
+<!--            android:value="@string/ads_app_id" />-->
+<!--        <meta-data-->
+<!--            android:name="applovin.sdk.key"-->
+<!--            android:value="@string/applovin_sdk_key" />-->
+<!--        <meta-data-->
+<!--            android:name="com.google.android.gms.ads.AD_MANAGER_APP"-->
+<!--            android:value="true" />-->
+<!--        <meta-data-->
+<!--            android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"-->
+<!--            android:value="true" />-->
+<!--        <meta-data-->
+<!--            android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"-->
+<!--            android:value="true" />-->
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -62,10 +65,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/paths" />
         </provider>
-
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

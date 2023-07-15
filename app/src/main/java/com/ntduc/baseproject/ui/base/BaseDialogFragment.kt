@@ -1,5 +1,6 @@
 package com.ntduc.baseproject.ui.base
 
+import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -15,9 +16,15 @@ import kotlin.math.roundToInt
 open class BaseDialogFragment<T : ViewDataBinding> constructor(
     @LayoutRes val contentLayoutId: Int,
     private val widthRatio: Float = 0.9f,
+    private val heightRatio: Float = WRAP_CONTENT,
     private val isCanceledOnTouchOutside: Boolean = false,
     private val gravity: Int = Gravity.CENTER
 ) : BindingDialogFragment<T>(contentLayoutId) {
+
+    companion object {
+        const val MATCH_PARENT = -1f
+        const val WRAP_CONTENT = -2f
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -28,8 +35,8 @@ open class BaseDialogFragment<T : ViewDataBinding> constructor(
             if (mDialog.window != null) {
                 mDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                 mDialog.window!!.setLayout(
-                    (requireActivity().resources.displayMetrics.widthPixels * widthRatio).roundToInt(),
-                    WindowManager.LayoutParams.WRAP_CONTENT
+                    if (widthRatio == WRAP_CONTENT) WindowManager.LayoutParams.WRAP_CONTENT else if (widthRatio == MATCH_PARENT) WindowManager.LayoutParams.MATCH_PARENT else (requireActivity().resources.displayMetrics.widthPixels * widthRatio).roundToInt(),
+                    if (heightRatio == WRAP_CONTENT) WindowManager.LayoutParams.WRAP_CONTENT else if (heightRatio == MATCH_PARENT) WindowManager.LayoutParams.MATCH_PARENT else (requireActivity().resources.displayMetrics.heightPixels * heightRatio).roundToInt()
                 )
 
                 val layoutParams = mDialog.window!!.attributes
@@ -42,6 +49,13 @@ open class BaseDialogFragment<T : ViewDataBinding> constructor(
         addEvent()
         addObservers()
         initData()
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        onDismissListener?.let {
+            it()
+        }
+        super.onDismiss(dialog)
     }
 
     override fun show(manager: FragmentManager, tag: String?) {
@@ -73,4 +87,10 @@ open class BaseDialogFragment<T : ViewDataBinding> constructor(
     open fun addObservers() {}
 
     open fun initData() {}
+
+    private var onDismissListener: (() -> Unit)? = null
+
+    fun setOnDismissListener(listener: () -> Unit) {
+        onDismissListener = listener
+    }
 }
