@@ -12,16 +12,20 @@ plugins {
 //    id 'com.google.firebase.firebase-perf'
 }
 
+def versionMajor = 0
+def versionMinor = 0
+def versionPatch = 1
+
 android {
-    namespace 'com.ntduc.baseproject'
+    namespace 'com.android.ntduc.baseproject'
     compileSdk 33
 
     defaultConfig {
         applicationId "com.ntduc.baseproject"
         minSdk 24
         targetSdk 33
-        versionCode 1
-        versionName "1.0.0"
+        versionCode(versionMajor * 100 + versionMinor * 10 + versionPatch)
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
 
         def date = new Date().format('dd.MM.yyyy')
         def hour = new Date().format('HH')
@@ -29,17 +33,42 @@ android {
         archivesBaseName = "Base_Project_V${versionName}_${date}_${hour}h${minutes}"
     }
 
+//    signingConfigs {
+//        debug {
+//            keyAlias 'key0'
+//            keyPassword 'prox@123'
+//            storeFile file("keystore.jks")
+//            storePassword 'prox@123'
+//        }
+//
+//        release {
+//            keyAlias 'key0'
+//            keyPassword 'prox@123'
+//            storeFile file("keystore.jks")
+//            storePassword 'prox@123'
+//        }
+//    }
+
     buildTypes {
         debug {
+            manifestPlaceholders = [crashlyticsCollectionEnabled: "false"]
+
             resValue "string", "ads_app_id", "ADS_APP_ID"
             resValue "string", "applovin_sdk_key", "APPLOVIN_SDK_KEY"
+
+//            signingConfig signingConfigs.debug
         }
         release {
-            minifyEnabled false
+            manifestPlaceholders = [crashlyticsCollectionEnabled: "true"]
+            minifyEnabled true
+            shrinkResources true
+
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             resValue "string", "ads_app_id", "ADS_APP_ID"
             resValue "string", "applovin_sdk_key", "APPLOVIN_SDK_KEY"
+
+//            signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -147,5 +176,7 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
 
     //ADS: https://gitlab.com/proxglobal/android/proxlib/-/tree/multiple_mediation
-//    implementation "prox-lib:prox-utils-multiple-mediation:2.4.0-test-2"
+//    implementation ("prox-lib:prox-utils-multiple-mediation:2.4.0-test-2"){
+//            exclude group: "com.google.android.play", module: "core"
+//    }
 }
