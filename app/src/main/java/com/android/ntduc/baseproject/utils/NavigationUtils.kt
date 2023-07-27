@@ -13,16 +13,15 @@ import androidx.navigation.Navigator
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.android.ntduc.baseproject.R
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.transition.MaterialElevationScale
 import com.google.android.material.transition.MaterialSharedAxis
-import com.android.ntduc.baseproject.R
 
 fun AppCompatActivity.setupNavigationWithActionBar(
   navController: NavController
@@ -180,7 +179,7 @@ fun navigateToDesWithMotionScale(
   currentFragment: Fragment,
   startView: View,
   args: Bundle? = null,
-  navOptions: NavOptions? = DEFAULT_NAV_OPTION,
+  navOptions: NavOptions? = null,
   navigatorExtras: Navigator.Extras? = null
 ) {
   currentFragment.setMotionScaleStart()
@@ -195,7 +194,7 @@ fun navigateToDesWithMotionAxisZ(
   @IdRes idDes: Int,
   currentFragment: Fragment,
   args: Bundle? = null,
-  navOptions: NavOptions? = DEFAULT_NAV_OPTION,
+  navOptions: NavOptions? = null,
   navigatorExtras: Navigator.Extras? = null
 ) {
   currentFragment.setMotionAxisZStart()
@@ -219,7 +218,7 @@ fun Fragment.navigateToDesWithMotionScale(
   @IdRes idDes: Int,
   startView: View,
   args: Bundle? = null,
-  navOptions: NavOptions? = DEFAULT_NAV_OPTION,
+  navOptions: NavOptions? = null,
   navigatorExtras: Navigator.Extras? = null
 ) {
   this.setMotionScaleStart()
@@ -235,7 +234,7 @@ fun Fragment.navigateToDesWithMotionItem(
   endTransitionName: String,
   @IdRes idNavHostFragment: Int,
   args: Bundle? = null,
-  navOptions: NavOptions? = DEFAULT_NAV_OPTION
+  navOptions: NavOptions? = null
 ) {
   this.setMotionScaleStart()
   val extras = FragmentNavigatorExtras(startView to endTransitionName)
@@ -249,7 +248,7 @@ fun Fragment.navigateToDesWithMotionItem(
 fun Fragment.navigateToDesWithMotionAxisZ(
   @IdRes idDes: Int,
   args: Bundle? = null,
-  navOptions: NavOptions? = DEFAULT_NAV_OPTION,
+  navOptions: NavOptions? = null,
   navigatorExtras: Navigator.Extras? = null
 ) {
   this.setMotionAxisZStart()
@@ -292,14 +291,12 @@ fun Fragment.setMotionAxisZStart() =
     }
   }
 
-private val DEFAULT_NAV_OPTION = navOptions {
-  anim {
-    enter = R.anim.slide_in_right
-    exit = R.anim.slide_out_left
-    popEnter = R.anim.slide_in_left
-    popExit = R.anim.slide_out_right
-  }
-}
+private val DEFAULT_NAV_OPTION = NavOptions.Builder()
+  .setEnterAnim(R.anim.slide_in_right)
+  .setExitAnim(R.anim.slide_out_left)
+  .setPopEnterAnim(R.anim.slide_in_left)
+  .setPopExitAnim(R.anim.slide_out_right)
+  .build()
 
 const val ID_START_VIEW_MOTION_SCALE = "ID_START_VIEW_MOTION_SCALE"
 const val IS_MOTION_AXIS_Z = "IS_MOTION_AXIS_Z"
