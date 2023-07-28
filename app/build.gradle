@@ -98,6 +98,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(path: ':RecyclerViewSticky')
     implementation project(path: ':ViewPager2Transformer')
+    implementation project(path: ':NumberPicker')
 
     //Room
     def roomVersion = '2.5.2'
