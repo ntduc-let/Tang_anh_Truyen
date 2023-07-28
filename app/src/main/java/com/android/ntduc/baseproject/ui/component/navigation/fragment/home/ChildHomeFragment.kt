@@ -1,4 +1,4 @@
-package com.android.ntduc.baseproject.ui.component.navigation.fragment
+package com.android.ntduc.baseproject.ui.component.navigation.fragment.home
 
 import android.util.Log
 import androidx.fragment.app.activityViewModels
@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.ntduc.baseproject.R
 import com.android.ntduc.baseproject.data.Resource
 import com.android.ntduc.baseproject.data.dto.file.BaseFile
-import com.android.ntduc.baseproject.databinding.FragmentHomeBinding
+import com.android.ntduc.baseproject.databinding.FragmentChildHomeBinding
 import com.android.ntduc.baseproject.ui.base.BaseFragment
 import com.android.ntduc.baseproject.ui.component.navigation.NavigationViewModel
 import com.android.ntduc.baseproject.ui.component.navigation.adapter.FileAdapter
@@ -17,7 +17,7 @@ import com.android.ntduc.baseproject.utils.view.visible
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
+class ChildHomeFragment : BaseFragment<FragmentChildHomeBinding>(R.layout.fragment_child_home) {
 
     private val viewModel: NavigationViewModel by activityViewModels()
     private lateinit var fileAdapter: FileAdapter

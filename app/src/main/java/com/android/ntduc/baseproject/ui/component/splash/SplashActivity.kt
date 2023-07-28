@@ -23,7 +23,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(R.layout.activity_spl
         Handler(Looper.getMainLooper()).postDelayed({
             startActivity(Intent(this@SplashActivity, NavigationActivity::class.java))
             finish()
-        }, 5000)
+        }, 50)
     }
 
     override fun onBackPressed() {}

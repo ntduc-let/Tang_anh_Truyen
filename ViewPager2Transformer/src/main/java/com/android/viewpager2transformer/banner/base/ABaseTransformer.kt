@@ -1,4 +1,4 @@
-package com.android.viewpager2transformer
+package com.android.viewpager2transformer.banner.base
 
 import android.view.View
 import androidx.viewpager2.widget.ViewPager2

@@ -1,8 +1,9 @@
-package com.android.viewpager2transformer
+package com.android.viewpager2transformer.banner
 
 import android.view.View
+import com.android.viewpager2transformer.banner.base.ABaseTransformer
 
-open class RotateUpTransformer : ABaseTransformer() {
+open class RotateDownTransformer : ABaseTransformer() {
   override val isPagingEnabled: Boolean
     get() = true
   
@@ -11,15 +12,15 @@ open class RotateUpTransformer : ABaseTransformer() {
     
     page.apply {
       val width = width.toFloat()
+      val height = height.toFloat()
       
       pivotX = width * 0.5f
-      pivotY = 0f
-      translationX = 0f
+      pivotY = height
       this.rotation = rotation
     }
   }
   
   companion object {
-    private const val ROT_MOD = -15f
+    private const val ROT_MOD = 18.75f
   }
 }
