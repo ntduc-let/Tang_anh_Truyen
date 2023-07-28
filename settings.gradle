@@ -31,4 +31,3 @@ rootProject.name = "Base Project"
 include ':app'
 include ':RecyclerViewSticky'
 include ':ViewPager2Transformer'
-include ':polygonimageview'

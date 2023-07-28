@@ -96,7 +96,6 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.3.0'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(path: ':polygonimageview')
     implementation project(path: ':RecyclerViewSticky')
     implementation project(path: ':ViewPager2Transformer')
 
