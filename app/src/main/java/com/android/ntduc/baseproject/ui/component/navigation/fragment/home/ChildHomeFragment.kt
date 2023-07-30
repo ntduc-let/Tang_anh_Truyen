@@ -108,7 +108,7 @@ class ChildHomeFragment : BaseFragment<FragmentChildHomeBinding>(R.layout.fragme
             binding.empty.gone()
             binding.rcv.visible()
         }
-        fileAdapter.submitList(list.subList(0, 10))
+        fileAdapter.submitList(list)
     }
 
     private fun showLoadingView() {
