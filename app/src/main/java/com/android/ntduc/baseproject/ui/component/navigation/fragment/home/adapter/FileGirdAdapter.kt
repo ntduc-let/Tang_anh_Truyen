@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.android.ntduc.baseproject.R
 import com.android.ntduc.baseproject.constant.FileTypeExtension
 import com.android.ntduc.baseproject.data.dto.file.BaseFile
-import com.android.ntduc.baseproject.databinding.ItemDocumentBinding
+import com.android.ntduc.baseproject.databinding.ItemDocumentGirdBinding
 import com.android.ntduc.baseproject.utils.formatBytes
 import com.android.ntduc.baseproject.utils.loadImg
 import com.ntduc.recyclerviewadvanced.draggable.DraggableItemAdapter
@@ -25,9 +25,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FileAdapter(
+class FileGirdAdapter(
     val context: Context
-) : BindingListAdapter<BaseFile, FileAdapter.ItemViewHolder>(diffUtil), DraggableItemAdapter<FileAdapter.ItemViewHolder> {
+) : BindingListAdapter<BaseFile, FileGirdAdapter.ItemViewHolder>(diffUtil), DraggableItemAdapter<FileGirdAdapter.ItemViewHolder> {
 
     init {
         setHasStableIds(true)
@@ -36,13 +36,13 @@ class FileAdapter(
     override fun getItemId(position: Int): Long = currentList[position]?.id ?: 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder =
-        parent.binding<ItemDocumentBinding>(R.layout.item_document).let(::ItemViewHolder)
+        parent.binding<ItemDocumentGirdBinding>(R.layout.item_document_gird).let(::ItemViewHolder)
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) =
         holder.bind(getItem(position))
 
     inner class ItemViewHolder constructor(
-        val binding: ItemDocumentBinding
+        val binding: ItemDocumentGirdBinding
     ) : AbstractDraggableItemViewHolder(binding.root) {
 
         fun bind(baseFile: BaseFile) {
@@ -76,6 +76,7 @@ class FileAdapter(
                         }
                     }
                 }
+
                 else -> {
                     context.loadImg(
                         imgUrl = baseFile.data!!,
