@@ -1,4 +1,4 @@
-package com.android.ntduc.baseproject.ui.component.navigation.adapter
+package com.android.ntduc.baseproject.ui.component.navigation.fragment.home.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -9,13 +9,15 @@ import android.view.ViewGroup
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.android.ntduc.baseproject.R
 import com.android.ntduc.baseproject.constant.FileTypeExtension
 import com.android.ntduc.baseproject.data.dto.file.BaseFile
 import com.android.ntduc.baseproject.databinding.ItemDocumentBinding
 import com.android.ntduc.baseproject.utils.formatBytes
 import com.android.ntduc.baseproject.utils.loadImg
+import com.ntduc.recyclerviewadvanced.draggable.DraggableItemAdapter
+import com.ntduc.recyclerviewadvanced.draggable.ItemDraggableRange
+import com.ntduc.recyclerviewadvanced.utils.AbstractDraggableItemViewHolder
 import com.skydoves.bindables.BindingListAdapter
 import com.skydoves.bindables.binding
 import kotlinx.coroutines.CoroutineScope
@@ -25,17 +27,23 @@ import kotlinx.coroutines.withContext
 
 class FileAdapter(
     val context: Context
-) : BindingListAdapter<BaseFile, FileAdapter.DocumentViewHolder>(diffUtil) {
+) : BindingListAdapter<BaseFile, FileAdapter.ItemViewHolder>(diffUtil), DraggableItemAdapter<FileAdapter.ItemViewHolder> {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DocumentViewHolder =
-        parent.binding<ItemDocumentBinding>(R.layout.item_document).let(::DocumentViewHolder)
+    init {
+        setHasStableIds(true)
+    }
 
-    override fun onBindViewHolder(holder: DocumentViewHolder, position: Int) =
+    override fun getItemId(position: Int): Long = currentList[position]?.id ?: 0
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder =
+        parent.binding<ItemDocumentBinding>(R.layout.item_document).let(::ItemViewHolder)
+
+    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) =
         holder.bind(getItem(position))
 
-    inner class DocumentViewHolder constructor(
-        private val binding: ItemDocumentBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
+    inner class ItemViewHolder constructor(
+        val binding: ItemDocumentBinding
+    ) : AbstractDraggableItemViewHolder(binding.root) {
 
         fun bind(baseFile: BaseFile) {
             binding.apply {
@@ -105,5 +113,36 @@ class FileAdapter(
 
     fun setOnClickListener(listener: (View, BaseFile) -> Unit) {
         onClickListener = listener
+    }
+
+    override fun onCheckCanStartDrag(holder: ItemViewHolder, position: Int, x: Int, y: Int): Boolean {
+        val containerView: View = holder.binding.cardView
+        val offsetX = containerView.left + (containerView.translationX + 0.5f).toInt()
+        val offsetY = containerView.top + (containerView.translationY + 0.5f).toInt()
+        val tx = (containerView.translationX + 0.5f).toInt()
+        val ty = (containerView.translationY + 0.5f).toInt()
+        val left = containerView.left + tx
+        val right = containerView.right + tx
+        val top = containerView.top + ty
+        val bottom = containerView.bottom + ty
+        return (x - offsetX in left..right) && (y - offsetY in top..bottom)
+    }
+
+    override fun onGetItemDraggableRange(holder: ItemViewHolder, position: Int): ItemDraggableRange? = null
+
+    override fun onMoveItem(fromPosition: Int, toPosition: Int) {
+        onMoveItemListener?.let {
+            it(fromPosition, toPosition)
+        }
+    }
+
+    override fun onCheckCanDrop(draggingPosition: Int, dropPosition: Int): Boolean = true
+    override fun onItemDragStarted(position: Int) {}
+    override fun onItemDragFinished(fromPosition: Int, toPosition: Int, result: Boolean) {}
+
+    private var onMoveItemListener: ((Int, Int) -> Unit)? = null
+
+    fun setOnMoveItemListener(listener: (Int, Int) -> Unit) {
+        onMoveItemListener = listener
     }
 }
