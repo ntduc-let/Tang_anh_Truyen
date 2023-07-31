@@ -19,6 +19,7 @@ dependencyResolutionManagement {
         maven { url 'https://artifacts.applovin.com/android' }
         maven { url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" }
         maven {
+            allowInsecureProtocol = true
             url "${artifactory_contextUrl}"
             credentials {
                 username = "${artifactory_user}"

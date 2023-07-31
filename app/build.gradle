@@ -177,7 +177,7 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
 
     //ADS: https://gitlab.com/proxglobal/android/proxlib/-/tree/multiple_mediation
-//    implementation ("prox-lib:prox-utils-multiple-mediation:2.4.0-test-2"){
+//    implementation ("prox-lib:prox-utils-multiple-mediation:2.4.4"){
 //            exclude group: "com.google.android.play", module: "core"
 //    }
 }
