@@ -8,13 +8,13 @@ import androidx.core.view.doOnPreDraw
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.transition.Slide
-import com.google.android.material.transition.MaterialContainerTransform
-import com.google.android.material.transition.MaterialSharedAxis
 import com.android.ntduc.baseproject.R
 import com.android.ntduc.baseproject.utils.ID_NAV_HOST_FRAGMENT
 import com.android.ntduc.baseproject.utils.ID_START_VIEW_MOTION_SCALE
 import com.android.ntduc.baseproject.utils.IS_MOTION_AXIS_Z
 import com.android.ntduc.baseproject.utils.IS_MOTION_ITEM
+import com.google.android.material.transition.MaterialContainerTransform
+import com.google.android.material.transition.MaterialSharedAxis
 import com.skydoves.bindables.BindingFragment
 
 abstract class BaseFragment<T : ViewDataBinding> constructor(
@@ -44,7 +44,7 @@ abstract class BaseFragment<T : ViewDataBinding> constructor(
         val idNavHostFragment = arguments?.getInt(ID_NAV_HOST_FRAGMENT, 0)
         if (isMotionItem != null && isMotionItem && idNavHostFragment != null && idNavHostFragment != 0) {
             sharedElementEnterTransition = MaterialContainerTransform().apply {
-                drawingViewId = R.id.nav_host_fragment
+                drawingViewId = idNavHostFragment
                 duration = resources.getInteger(R.integer.reply_motion_duration_large).toLong()
                 scrimColor = Color.TRANSPARENT
             }
