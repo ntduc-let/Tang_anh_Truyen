@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import kotlin.math.max
+import kotlin.math.min
 
 
 @AndroidEntryPoint
@@ -82,18 +83,33 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         val scaleWidth = targetWidth.toFloat() / originalWidth
         val scaleHeight = targetHeight.toFloat() / originalHeight
 
+        // Chọn tỉ lệ phóng to/thu nhỏ lớn nhất để đảm bảo ảnh không bị cắt và tập trung vào giữa
+        val scaleFactor = Math.max(scaleWidth, scaleHeight)
+
+        // Tính toán kích thước mới dựa trên tỉ lệ phóng to/thu nhỏ
+        val newWidth = (originalWidth * scaleFactor).toInt()
+        val newHeight = (originalHeight * scaleFactor).toInt()
+
         // Tạo ma trận biến đổi để thực hiện phóng to/thu nhỏ
         val matrix = Matrix()
-        matrix.postScale(scaleWidth, scaleHeight)
+        matrix.postScale(scaleFactor, scaleFactor)
 
         // Phóng to/thu nhỏ bitmap với kích thước mới
         val scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, originalWidth, originalHeight, matrix, true)
 
         // Tính toán điểm bắt đầu để cắt bỏ phần dư và tập trung vào giữa
-        val xOffset = (scaledBitmap.width - targetWidth) / 2
-        val yOffset = (scaledBitmap.height - targetHeight) / 2
+        val xOffset = (newWidth - targetWidth) / 2
+        val yOffset = (newHeight - targetHeight) / 2
 
-        // Cắt bitmap để có kích thước yêu cầu và tập trung vào giữa
-        return Bitmap.createBitmap(scaledBitmap, xOffset, yOffset, targetWidth, targetHeight)
+        // Kiểm tra xem offset có âm hay không
+        val x = if (xOffset < 0) 0 else xOffset
+        val y = if (yOffset < 0) 0 else yOffset
+
+        // Kiểm tra kích thước bitmap đầu ra có thoả mãn yêu cầu hay không
+        val outputWidth = Math.min(targetWidth, scaledBitmap.width - x)
+        val outputHeight = Math.min(targetHeight, scaledBitmap.height - y)
+
+        // Tạo bitmap đầu ra có kích thước yêu cầu và tập trung vào giữa
+        return Bitmap.createBitmap(scaledBitmap, x, y, outputWidth, outputHeight)
     }
 }
