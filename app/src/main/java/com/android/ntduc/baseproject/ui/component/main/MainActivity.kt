@@ -11,20 +11,29 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.airbnb.lottie.LottieDrawable
 import com.android.ntduc.baseproject.R
 import com.android.ntduc.baseproject.data.dto.lottie.Lottie
 import com.android.ntduc.baseproject.databinding.ActivityMainBinding
 import com.android.ntduc.baseproject.ui.base.BaseActivity
 import com.android.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
+import com.android.ntduc.baseproject.utils.file.delete
+import com.android.ntduc.baseproject.utils.file.open
+import com.android.ntduc.baseproject.utils.lottie.FrameCreator
+import com.android.ntduc.baseproject.utils.lottie.Recorder
+import com.android.ntduc.baseproject.utils.lottie.RecordingOperation
 import com.android.ntduc.baseproject.utils.toast.shortToast
 import com.android.ntduc.baseproject.utils.view.gone
 import com.android.ntduc.baseproject.utils.view.visible
+import com.bumptech.glide.Glide
 import com.google.gson.Gson
+import com.orhanobut.hawk.Hawk
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.InputStream
 import kotlin.math.max
 import kotlin.math.min
@@ -113,6 +122,31 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                 intent.addCategory(Intent.CATEGORY_OPENABLE)
                 intent.setDataAndType(uri, "image/*")
                 selectFileLauncher.launch(intent)
+            }
+
+            export.setOnClickShrinkEffectListener {
+                val lottieDrawable = LottieDrawable()
+                lottieDrawable.composition = binding.lottie.composition
+
+                binding.loading.visible()
+                binding.lottie.gone()
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val path = File(cacheDir, Environment.DIRECTORY_PICTURES).apply { mkdirs() }
+                    val videoFile = File(path, "lottie_in_video.mp4").apply {
+                        if (exists()) delete(this@MainActivity)
+                    }
+                    val recordingOperation = RecordingOperation(
+                        Recorder(context = this@MainActivity, videoOutput = videoFile, width = WIDTH, height = HEIGHT),
+                        FrameCreator(lottieDrawable)
+                    ) {
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            binding.loading.gone()
+                            videoFile.open(this@MainActivity, "$packageName.provider")
+                        }
+                    }
+                    recordingOperation.start()
+                }
             }
         }
     }

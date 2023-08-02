@@ -32,9 +32,9 @@ import androidx.core.view.setMargins
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionManager
+import com.android.ntduc.baseproject.utils.dp
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.transition.MaterialContainerTransform
-import com.android.ntduc.baseproject.utils.dp
 
 fun View.visible() {
   this.visibility = View.VISIBLE
@@ -441,7 +441,7 @@ fun Drawable.toBitmap(): Bitmap {
   if (this is BitmapDrawable) {
     return bitmap
   }
-  
+
   val bitmap = if (intrinsicWidth <= 0 || intrinsicHeight <= 0) {
     Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
   } else {
