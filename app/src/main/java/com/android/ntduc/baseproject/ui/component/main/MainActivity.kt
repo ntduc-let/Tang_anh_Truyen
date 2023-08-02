@@ -6,20 +6,25 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
+import android.util.Base64
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.android.ntduc.baseproject.R
+import com.android.ntduc.baseproject.data.dto.lottie.Lottie
 import com.android.ntduc.baseproject.databinding.ActivityMainBinding
 import com.android.ntduc.baseproject.ui.base.BaseActivity
 import com.android.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.android.ntduc.baseproject.utils.toast.shortToast
-import com.bumptech.glide.Glide
+import com.android.ntduc.baseproject.utils.view.gone
+import com.android.ntduc.baseproject.utils.view.visible
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import kotlin.math.max
 import kotlin.math.min
@@ -39,21 +44,58 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == RESULT_OK) {
                 val path = it.data?.data ?: return@registerForActivityResult
+                binding.loading.visible()
+                binding.lottie.gone()
+                if (binding.lottie.isAnimating){
+                    binding.lottie.pauseAnimation()
+                }
                 lifecycleScope.launch(Dispatchers.IO) {
+                    var resizeBitmap: Bitmap? = null
                     var inputStream: InputStream? = null
                     try {
                         inputStream = contentResolver.openInputStream(path)
                         val bitmap = BitmapFactory.decodeStream(inputStream)
-                        val resizeBitmap = resizeBitmap(bitmap, WIDTH, HEIGHT)
-                        Log.d("ntduc_debug", "w: ${resizeBitmap.width}")
-                        Log.d("ntduc_debug", "h: ${resizeBitmap.height}")
-                        withContext(Dispatchers.Main) {
-                            Glide.with(this@MainActivity).load(resizeBitmap).into(binding.img)
-                        }
+                        resizeBitmap = resizeAndCropBitmap(bitmap, HEIGHT, WIDTH)
+//                        bitmap.recycle()
                     } catch (e: Exception) {
                         Log.d("ntduc_debug", "error: ${e.message}")
                     } finally {
                         inputStream?.close()
+                    }
+                    if (resizeBitmap == null) {
+                        withContext(Dispatchers.Main) {
+                            binding.loading.gone()
+                        }
+                        return@launch
+                    }
+
+                    val byteArrayOutputStream = ByteArrayOutputStream()
+                    resizeBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+                    val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
+                    val base64 = Base64.encodeToString(byteArray, Base64.DEFAULT)
+
+                    var textRaw: String
+                    resources.openRawResource(R.raw.render_image).use { inpS ->
+                        inpS.bufferedReader().use { br ->
+                            textRaw = br.readText()
+                            br.close()
+                        }
+                        inpS.close()
+                    }
+                    val json = Gson().fromJson(textRaw, Lottie::class.java)
+                    json.assets[1].p = "data:image/png;base64,$base64"
+
+
+                    val newAssets = Gson().toJson(json)
+
+                    val newJson = textRaw.substringBefore("\"assets\"") + newAssets.substring(1, newAssets.length - 1) + ",\"layers\"" + textRaw.substringAfter("\"layers\"")
+                    withContext(Dispatchers.Main) {
+                        binding.loading.gone()
+                        binding.lottie.visible()
+                        binding.lottie.setAnimationFromJson(newJson, null)
+                        if (!binding.lottie.isAnimating){
+                            binding.lottie.playAnimation()
+                        }
                     }
                 }
             } else {
@@ -75,7 +117,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         }
     }
 
-    private fun resizeBitmap(bitmap: Bitmap, targetWidth: Int, targetHeight: Int): Bitmap {
+    private fun resizeAndCropBitmap(bitmap: Bitmap, targetHeight: Int, targetWidth: Int): Bitmap {
         val originalWidth = bitmap.width
         val originalHeight = bitmap.height
 
@@ -84,7 +126,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         val scaleHeight = targetHeight.toFloat() / originalHeight
 
         // Chọn tỉ lệ phóng to/thu nhỏ lớn nhất để đảm bảo ảnh không bị cắt và tập trung vào giữa
-        val scaleFactor = Math.max(scaleWidth, scaleHeight)
+        val scaleFactor = max(scaleWidth, scaleHeight)
 
         // Tính toán kích thước mới dựa trên tỉ lệ phóng to/thu nhỏ
         val newWidth = (originalWidth * scaleFactor).toInt()
@@ -106,10 +148,15 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         val y = if (yOffset < 0) 0 else yOffset
 
         // Kiểm tra kích thước bitmap đầu ra có thoả mãn yêu cầu hay không
-        val outputWidth = Math.min(targetWidth, scaledBitmap.width - x)
-        val outputHeight = Math.min(targetHeight, scaledBitmap.height - y)
+        val outputWidth = min(targetWidth, scaledBitmap.width - x)
+        val outputHeight = min(targetHeight, scaledBitmap.height - y)
 
         // Tạo bitmap đầu ra có kích thước yêu cầu và tập trung vào giữa
-        return Bitmap.createBitmap(scaledBitmap, x, y, outputWidth, outputHeight)
+        val croppedBitmap = Bitmap.createBitmap(scaledBitmap, x, y, outputWidth, outputHeight)
+
+        // Recycle bitmap đã scale, vì chỉ cần dùng đến croppedBitmap
+//        scaledBitmap.recycle()
+
+        return croppedBitmap
     }
 }
