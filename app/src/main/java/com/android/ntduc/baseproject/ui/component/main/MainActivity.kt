@@ -45,8 +45,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     private val viewModel: MainViewModel by viewModels()
 
     companion object {
-        private const val WIDTH = 3024
-        private const val HEIGHT = 4032
+        private const val WIDTH = 756
+        private const val HEIGHT = 1008
     }
 
     private val selectFileLauncher =
