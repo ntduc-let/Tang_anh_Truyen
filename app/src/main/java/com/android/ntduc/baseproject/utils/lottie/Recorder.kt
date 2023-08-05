@@ -45,11 +45,11 @@ class Recorder(
 
     companion object {
         private const val VERBOSE = false
-        private const val DEFAULT_IFRAME_INTERVAL = 5
+        private const val DEFAULT_IFRAME_INTERVAL = 0
         private const val DEFAULT_BITRATE = 4 * 1000 * 1000
         private const val DEFAULT_WIDTH = 720
         private const val DEFAULT_HEIGHT = 720
-        private const val DEFAULT_FPS = 30
+        private const val DEFAULT_FPS = 24
         private const val TIMEOUT_USEC = 10000
     }
 
