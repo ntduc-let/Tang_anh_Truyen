@@ -16,7 +16,6 @@ import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.LottieImageAsset
 import com.android.ntduc.baseproject.R
-import com.android.ntduc.baseproject.data.dto.lottie.Lottie
 import com.android.ntduc.baseproject.databinding.ActivityMainBinding
 import com.android.ntduc.baseproject.ui.base.BaseActivity
 import com.android.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
@@ -28,9 +27,6 @@ import com.android.ntduc.baseproject.utils.lottie.RecordingOperation
 import com.android.ntduc.baseproject.utils.toast.shortToast
 import com.android.ntduc.baseproject.utils.view.gone
 import com.android.ntduc.baseproject.utils.view.visible
-import com.bumptech.glide.Glide
-import com.google.gson.Gson
-import com.orhanobut.hawk.Hawk
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,8 +44,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     private val viewModel: MainViewModel by viewModels()
 
     companion object {
-        private const val WIDTH = 756
-        private const val HEIGHT = 1008
+        private const val WIDTH = 1080
+        private const val HEIGHT = 1920
     }
 
     @SuppressLint("RestrictedApi")
@@ -88,12 +84,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                     val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
                     val base64 = Base64.encodeToString(byteArray, Base64.DEFAULT)
                     withContext(Dispatchers.Main) {
+                        val outputImage = binding.lottie.composition?.images?.get("image_1")
+                        if (outputImage != null){
+                            binding.lottie.composition!!.images!!["image_1"] = LottieImageAsset(outputImage.width, outputImage.height, outputImage.id, "data:image/png;base64,$base64", outputImage.dirName)
+                        }
+
                         binding.loading.gone()
                         binding.lottie.visible()
-                        val image1 = binding.lottie.composition?.images?.get("image_1")
-                        if (image1 != null){
-                            binding.lottie.composition!!.images!!["image_1"] = LottieImageAsset(image1.width, image1.height, image1.id, "data:image/png;base64,$base64", image1.dirName)
-                        }
                     }
                 }
             } else {
