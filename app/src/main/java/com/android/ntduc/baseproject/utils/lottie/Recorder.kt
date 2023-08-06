@@ -1,13 +1,7 @@
 package com.android.ntduc.baseproject.utils.lottie
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.ColorFilter
-import android.graphics.Matrix
-import android.graphics.PixelFormat
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.media.MediaCodec
@@ -16,21 +10,17 @@ import android.media.MediaFormat
 import android.media.MediaMuxer
 import android.util.Log
 import android.view.Surface
-import com.android.ntduc.baseproject.utils.view.toBitmap
 import java.io.Closeable
 import java.io.File
 import java.nio.ByteBuffer
-import kotlin.math.max
-import kotlin.math.min
 
 class Recorder(
-    private val context: Context,
     mimeType: String = "video/avc",
     bitRate: Int = DEFAULT_BITRATE,
     iFrameInterval: Int = DEFAULT_IFRAME_INTERVAL,
     private val framesPerSecond: Int = DEFAULT_FPS,
-    private val width: Int = DEFAULT_WIDTH,
-    private val height: Int = DEFAULT_HEIGHT,
+    width: Int = DEFAULT_WIDTH,
+    height: Int = DEFAULT_HEIGHT,
     videoOutput: File
 ) : Closeable {
 
@@ -84,27 +74,7 @@ class Recorder(
         val canvas = inputSurface.lockCanvas(null)
         try {
             canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)  // Here you need to set some kind of background. Could be any color
-            val resizeBitmap = resizeAndCropBitmap(currentFrame.toBitmap(), height, width)
-            val resizeFrame = object : Drawable() {
-                override fun draw(canvas: Canvas) {
-                    // Draw the Bitmap on the canvas
-                    canvas.drawBitmap(resizeBitmap, 0f, 0f, null)
-                }
-
-                override fun setAlpha(alpha: Int) {
-                    // Implement if needed
-                }
-
-                override fun setColorFilter(colorFilter: ColorFilter?) {
-                    // Implement if needed
-                }
-
-                override fun getOpacity(): Int {
-                    // Modify if needed
-                    return PixelFormat.OPAQUE
-                }
-            }
-            resizeFrame.draw(canvas)
+            currentFrame.draw(canvas)
         } finally {
             inputSurface.unlockCanvasAndPost(canvas)
         }
@@ -264,48 +234,5 @@ class Recorder(
         inputSurface.release()
         muxer.stop()
         muxer.release()
-    }
-
-    private fun resizeAndCropBitmap(bitmap: Bitmap, targetHeight: Int, targetWidth: Int): Bitmap {
-        val originalWidth = bitmap.width
-        val originalHeight = bitmap.height
-
-        // Tính toán tỉ lệ phóng to/thu nhỏ cho chiều cao và chiều rộng
-        val scaleWidth = targetWidth.toFloat() / originalWidth
-        val scaleHeight = targetHeight.toFloat() / originalHeight
-
-        // Chọn tỉ lệ phóng to/thu nhỏ lớn nhất để đảm bảo ảnh không bị cắt và tập trung vào giữa
-        val scaleFactor = max(scaleWidth, scaleHeight)
-
-        // Tính toán kích thước mới dựa trên tỉ lệ phóng to/thu nhỏ
-        val newWidth = (originalWidth * scaleFactor).toInt()
-        val newHeight = (originalHeight * scaleFactor).toInt()
-
-        // Tạo ma trận biến đổi để thực hiện phóng to/thu nhỏ
-        val matrix = Matrix()
-        matrix.postScale(scaleFactor, scaleFactor)
-
-        // Phóng to/thu nhỏ bitmap với kích thước mới
-        val scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, originalWidth, originalHeight, matrix, true)
-
-        // Tính toán điểm bắt đầu để cắt bỏ phần dư và tập trung vào giữa
-        val xOffset = (newWidth - targetWidth) / 2
-        val yOffset = (newHeight - targetHeight) / 2
-
-        // Kiểm tra xem offset có âm hay không
-        val x = if (xOffset < 0) 0 else xOffset
-        val y = if (yOffset < 0) 0 else yOffset
-
-        // Kiểm tra kích thước bitmap đầu ra có thoả mãn yêu cầu hay không
-        val outputWidth = min(targetWidth, scaledBitmap.width - x)
-        val outputHeight = min(targetHeight, scaledBitmap.height - y)
-
-        // Tạo bitmap đầu ra có kích thước yêu cầu và tập trung vào giữa
-        val croppedBitmap = Bitmap.createBitmap(scaledBitmap, x, y, outputWidth, outputHeight)
-
-        // Recycle bitmap đã scale, vì chỉ cần dùng đến croppedBitmap
-        scaledBitmap.recycle()
-
-        return croppedBitmap
     }
 }

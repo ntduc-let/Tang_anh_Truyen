@@ -1,9 +1,11 @@
 package com.android.ntduc.baseproject.ui.component.main
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Environment
 import android.util.Base64
@@ -12,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieDrawable
+import com.airbnb.lottie.LottieImageAsset
 import com.android.ntduc.baseproject.R
 import com.android.ntduc.baseproject.data.dto.lottie.Lottie
 import com.android.ntduc.baseproject.databinding.ActivityMainBinding
@@ -49,6 +52,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         private const val HEIGHT = 1008
     }
 
+    @SuppressLint("RestrictedApi")
     private val selectFileLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == RESULT_OK) {
@@ -74,6 +78,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                     if (resizeBitmap == null) {
                         withContext(Dispatchers.Main) {
                             binding.loading.gone()
+                            binding.lottie.visible()
                         }
                         return@launch
                     }
@@ -82,28 +87,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                     resizeBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
                     val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
                     val base64 = Base64.encodeToString(byteArray, Base64.DEFAULT)
-
-                    var textRaw: String
-                    resources.openRawResource(R.raw.render_image).use { inpS ->
-                        inpS.bufferedReader().use { br ->
-                            textRaw = br.readText()
-                            br.close()
-                        }
-                        inpS.close()
-                    }
-                    val json = Gson().fromJson(textRaw, Lottie::class.java)
-                    json.assets[1].p = "data:image/png;base64,$base64"
-
-
-                    val newAssets = Gson().toJson(json)
-
-                    val newJson = textRaw.substringBefore("\"assets\"") + newAssets.substring(1, newAssets.length - 1) + ",\"layers\"" + textRaw.substringAfter("\"layers\"")
                     withContext(Dispatchers.Main) {
                         binding.loading.gone()
                         binding.lottie.visible()
-                        binding.lottie.setAnimationFromJson(newJson, null)
-                        if (!binding.lottie.isAnimating){
-                            binding.lottie.playAnimation()
+                        val image1 = binding.lottie.composition?.images?.get("image_1")
+                        if (image1 != null){
+                            binding.lottie.composition!!.images!!["image_1"] = LottieImageAsset(image1.width, image1.height, image1.id, "data:image/png;base64,$base64", image1.dirName)
                         }
                     }
                 }
@@ -127,6 +116,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
             export.setOnClickShrinkEffectListener {
                 val lottieDrawable = LottieDrawable()
                 lottieDrawable.composition = binding.lottie.composition
+                lottieDrawable.bounds = Rect(0, 0, WIDTH, HEIGHT)
 
                 binding.loading.visible()
                 binding.lottie.gone()
@@ -137,7 +127,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                         if (exists()) delete(this@MainActivity)
                     }
                     val recordingOperation = RecordingOperation(
-                        Recorder(context = this@MainActivity, videoOutput = videoFile, width = WIDTH, height = HEIGHT),
+                        Recorder(videoOutput = videoFile, width = WIDTH, height = HEIGHT),
                         FrameCreator(lottieDrawable)
                     ) {
                         lifecycleScope.launch(Dispatchers.Main) {

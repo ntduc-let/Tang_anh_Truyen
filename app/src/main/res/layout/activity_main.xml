@@ -25,6 +25,8 @@
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/lottie"
                 android:layout_width="match_parent"
+                app:lottie_autoPlay="true"
+                app:lottie_rawRes="@raw/render_image"
                 android:layout_height="match_parent"
                 app:lottie_loop="true" />
 
