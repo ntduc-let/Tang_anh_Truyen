@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Environment
 import android.util.Base64
 import android.util.Log
+import android.widget.SeekBar
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -54,10 +55,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
             if (it.resultCode == RESULT_OK) {
                 val path = it.data?.data ?: return@registerForActivityResult
                 binding.loading.visible()
-                binding.lottie.gone()
-                if (binding.lottie.isAnimating){
-                    binding.lottie.pauseAnimation()
-                }
                 lifecycleScope.launch(Dispatchers.IO) {
                     var resizeBitmap: Bitmap? = null
                     var inputStream: InputStream? = null
@@ -74,7 +71,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                     if (resizeBitmap == null) {
                         withContext(Dispatchers.Main) {
                             binding.loading.gone()
-                            binding.lottie.visible()
                         }
                         return@launch
                     }
@@ -84,13 +80,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                     val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
                     val base64 = Base64.encodeToString(byteArray, Base64.DEFAULT)
                     withContext(Dispatchers.Main) {
+                        val inputImage = binding.lottie.composition?.images?.get("image_0")
+                        if (inputImage != null) {
+                            binding.lottie.composition!!.images!!["image_0"] = LottieImageAsset(inputImage.width, inputImage.height, inputImage.id, inputImage.fileName, inputImage.dirName)
+                        }
+
                         val outputImage = binding.lottie.composition?.images?.get("image_1")
-                        if (outputImage != null){
+                        if (outputImage != null) {
                             binding.lottie.composition!!.images!!["image_1"] = LottieImageAsset(outputImage.width, outputImage.height, outputImage.id, "data:image/png;base64,$base64", outputImage.dirName)
                         }
 
                         binding.loading.gone()
-                        binding.lottie.visible()
                     }
                 }
             } else {
@@ -116,7 +116,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                 lottieDrawable.bounds = Rect(0, 0, WIDTH, HEIGHT)
 
                 binding.loading.visible()
-                binding.lottie.gone()
 
                 lifecycleScope.launch(Dispatchers.IO) {
                     val path = File(cacheDir, Environment.DIRECTORY_PICTURES).apply { mkdirs() }
@@ -134,6 +133,30 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                     }
                     recordingOperation.start()
                 }
+            }
+
+            seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    if (fromUser) {
+                        binding.lottie.progress = progress.toFloat() / 100
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                    if (binding.lottie.isAnimating) {
+                        binding.lottie.pauseAnimation()
+                    }
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                    if (!binding.lottie.isAnimating) {
+                        binding.lottie.resumeAnimation()
+                    }
+                }
+            })
+
+            binding.lottie.addAnimatorUpdateListener {
+                binding.seekbar.progress = (binding.lottie.progress * 100).toInt()
             }
         }
     }

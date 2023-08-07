@@ -18,16 +18,23 @@
             android:layout_height="wrap_content"
             android:text="Export Video" />
 
-        <FrameLayout
+        <SeekBar
+            android:id="@+id/seekbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content" />
+
+        <FrameLayout
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="64dp"
+            android:layout_weight="1">
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/lottie"
-                android:layout_width="match_parent"
-                app:lottie_autoPlay="true"
-                app:lottie_rawRes="@raw/gender_image"
                 android:layout_height="match_parent"
+                app:lottie_autoPlay="true"
+                android:layout_width="match_parent"
+                app:lottie_rawRes="@raw/gender_image"
                 app:lottie_loop="true" />
 
             <ProgressBar
